@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1e1f22" />
+  <meta name="description" content="CHORUS β — Agentic Community Operating System & Control Panel" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>CHORUS β • Control Panel</title>
+
+  <!-- Favicon (SVG Data URI) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%235865F2'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Inter,sans-serif' font-weight='800' font-size='34' fill='white'%3Eβ%3C/text%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-primary: #1e1f22;
+      --bg-secondary: #2b2d31;
+      --bg-elevated: #313338;
+      --text-primary: #f2f3f5;
+      --text-secondary: #b5bac1;
+      --text-muted: #949ba4;
+      --blurple: #5865f2;
+      --blurple-hover: #4752c4;
+      --accent-purple: #8b5cf6;
+      --success: #23a55a;
+      --danger: #f23f43;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    html.theme-light {
+      --bg-primary: #f2f3f5;
+      --bg-secondary: #ffffff;
+      --bg-elevated: #ebedef;
+      --text-primary: #060607;
+      --text-secondary: #4e5058;
+      --text-muted: #5c5e66;
+      --border: rgba(6, 6, 7, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Full-Screen Seamless App Frame ─────────────────────────────────── */
+    #frame-wrapper {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: var(--bg-primary);
+    }
+
+    #chorus-gas-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: transparent;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #chorus-gas-frame.loaded {
+      opacity: 1;
+    }
+
+    /* ─── Animated Splash & Loading Screen ───────────────────────────────── */
+    #splash-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 35%, rgba(88, 101, 242, 0.16) 0%, var(--bg-primary) 70%);
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s ease;
+      padding: 24px;
+      text-align: center;
+    }
+
+    #splash-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .brand-orb-wrap {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-orb-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--blurple);
+      border-right-color: var(--accent-purple);
+      animation: orbitSpin 1.15s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+    }
+
+    .brand-orb-ring-outer {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px dashed rgba(88, 101, 242, 0.35);
+      animation: orbitSpinReverse 4s linear infinite;
+    }
+
+    .brand-orb-core {
+      width: 66px;
+      height: 66px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--blurple) 0%, var(--accent-purple) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(88, 101, 242, 0.45);
+      animation: pulseFloat 2.2s ease-in-out infinite;
+    }
+
+    @keyframes orbitSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes orbitSpinReverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @keyframes pulseFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-3px) scale(1.03); }
+    }
+
+    .splash-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, var(--text-primary), #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .splash-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 22px;
+    }
+
+    .progress-track {
+      width: min(280px, 80vw);
+      height: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    html.theme-light .progress-track {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 35%;
+      background: linear-gradient(90deg, var(--blurple), var(--accent-purple));
+      border-radius: 999px;
+      animation: indeterminateBar 1.4s ease-in-out infinite;
+    }
+
+    @keyframes indeterminateBar {
+      0% { transform: translateX(-100%); width: 35%; }
+      50% { width: 60%; }
+      100% { transform: translateX(260%); width: 35%; }
+    }
+
+    .splash-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    /* ─── Quick Connection / Deployment URL Modal (Press Ctrl+Shift+U or Gear) ─── */
+    #portal-fab {
+      position: fixed;
+      bottom: 42px;
+      right: 14px;
+      z-index: 60;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(30, 31, 34, 0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #b5bac1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      opacity: 0.25;
+      transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    }
+
+    #portal-fab:hover {
+      opacity: 1;
+      transform: scale(1.06);
+      background: var(--blurple);
+      color: #ffffff;
+    }
+
+    #config-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    #config-modal.active {
+      display: flex;
+    }
+
+    .config-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: min(520px, 96vw);
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .config-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .config-card p {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.45;
+    }
+
+    .config-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      margin-bottom: 14px;
+      outline: none;
+    }
+
+    .config-input:focus {
+      border-color: var(--blurple);
+    }
+
+    .config-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--blurple);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--blurple-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-primary);
+    }
+  
+    button:active:not(:disabled), .btn:active:not(:disabled), .btn.is-pressing {
+      transform: scale(0.95) translateY(1px) !important;
+      filter: brightness(0.84) saturate(0.85) !important;
+      box-shadow: inset 0 3px 8px rgba(0,0,0,0.35), 0 0 0 3px rgba(88,101,242,0.35) !important;
+    }
+    .btn.is-busy {
+      opacity: 0.68 !important;
+      filter: grayscale(0.3) !important;
+      cursor: wait !important;
+      pointer-events: none !important;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Animated Splash Screen -->
+  <div id="splash-loader">
+    <div class="brand-orb-wrap">
+      <div class="brand-orb-ring-outer"></div>
+      <div class="brand-orb-ring"></div>
+      <div class="brand-orb-core">β</div>
+    </div>
+    <div class="splash-title">CHORUS β OS</div>
+    <div class="splash-subtitle">Agentic Community Operating System &amp; Control Panel</div>
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+    <div class="splash-status">
+      <span class="status-dot"></span>
+      <span id="splash-status-text">Connecting to Google Apps Script Cloud...</span>
+    </div>
+  </div>
+
+  <!-- Full-Screen Google Apps Script Web App Iframe -->
+  <div id="frame-wrapper">
+    <iframe
+      id="chorus-gas-frame"
+      title="CHORUS β Control Panel"
+      allow="clipboard-read; clipboard-write; microphone; autoplay; fullscreen"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <!-- Discrete Floating Settings Button (Update GAS URL or Reload Frame) -->
+  <button id="portal-fab" title="Portal Connection Settings (Ctrl+Shift+U)" onclick="openPortalConfig()">⚙️</button>
+
+  <!-- Connection & Session Manager Modal -->
+  <div id="config-modal" onclick="if(event.target===this)closePortalConfig()">
+    <div class="config-card">
+      <h3>⚡ CHORUS β Portal Connection</h3>
+      <p>
+        This static GitHub Pages wrapper loads your deployed Google Apps Script Web App in full-screen mode and persists your login session &amp; theme across refreshes.
+      </p>
+      <label style="display:block;font-size:0.76rem;font-weight:700;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;">
+        Google Apps Script Deployment URL (/exec)
+      </label>
+      <input type="url" id="gas-url-input" class="config-input" placeholder="https://script.google.com/macros/s/.../exec" />
+      <div style="font-size:0.76rem;color:var(--text-muted);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <span id="session-indicator">Session: Checking...</span>
+        <button type="button" class="btn btn-secondary" style="padding:4px 8px;font-size:0.72rem;" onclick="clearPortalSavedSession()">Clear Saved Session</button>
+      </div>
+      <div class="config-actions">
+        <button type="button" class="btn btn-secondary" onclick="resetDefaultGasUrl()">Reset Default</button>
+        <button type="button" class="btn btn-secondary" onclick="closePortalConfig()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="savePortalGasUrl()">Save &amp; Reload</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    //  1. DEFAULT GOOGLE APPS SCRIPT DEPLOYMENT URL
+    //     (Pre-configured with your latest deployment link; can also be overridden
+    //      via ?gas_url=... query param or the ⚙️ button)
+    // =========================================================================
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxtmiLF5F_WW7blCJjVHqp4gKYuVv5AJppZAPmcejCv03eSFfjWZkYGPQUx9if2AE1L/exec";
+
+    const STORAGE_KEYS = {
+      GAS_URL: "chorus_portal_gas_url",
+      TOKEN: "chorus_portal_token",
+      USER: "chorus_portal_user",
+      THEME: "chorus_portal_theme",
+      SERVER_ID: "chorus_portal_server_id"
+    };
+
+    const frameEl = document.getElementById("chorus-gas-frame");
+    const splashEl = document.getElementById("splash-loader");
+    const statusTextEl = document.getElementById("splash-status-text");
+    let splashHidden = false;
+
+    function getActiveGasUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramUrl = urlParams.get("gas_url");
+      if (paramUrl && paramUrl.startsWith("https://script.google.com/")) {
+        localStorage.setItem(STORAGE_KEYS.GAS_URL, paramUrl.trim());
+        return paramUrl.trim();
+      }
+      return localStorage.getItem(STORAGE_KEYS.GAS_URL) || DEFAULT_GAS_URL;
+    }
+
+    function applyPortalTheme(theme) {
+      const htmlEl = document.documentElement;
+      const effective = theme === "auto"
+        ? (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")
+        : (theme === "light" ? "light" : "dark");
+      htmlEl.classList.remove("theme-dark", "theme-light");
+      htmlEl.classList.add("theme-" + effective);
+    }
+
+    function buildTargetFrameUrl() {
+      const base = getActiveGasUrl();
+      const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) || "dark";
+      const savedServer = localStorage.getItem(STORAGE_KEYS.SERVER_ID) || "";
+      const sep = base.includes("?") ? "&" : "?";
+      let target = `${base}${sep}theme=${encodeURIComponent(savedTheme)}`;
+      if (savedServer) {
+        target += `&server=${encodeURIComponent(savedServer)}`;
+      }
+      return target;
+    }
+
+    function hideSplash() {
+      if (splashHidden) return;
+      splashHidden = true;
+      frameEl.classList.add("loaded");
+      splashEl.classList.add("hidden");
+    }
+
+    function pushSessionToIframe() {
+      try {
+        if (!frameEl.contentWindow) return;
+        const token = localStorage.getItem(STORAGE_KEYS.TOKEN) || null;
+        let user = null;
+        try {
+          user = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER) || "null");
+        } catch (e) {}
+        const theme = localStorage.getItem(STORAGE_KEYS.THEME) || "dark";
+        const activeServerId = localStorage.getItem(STORAGE_KEYS.SERVER_ID) || null;
+
+        frameEl.contentWindow.postMessage({
+          source: "CHORUS_GH_PAGES",
+          type: "CHORUS_RESTORE_SESSION",
+          token: token,
+          user: user,
+          theme: theme,
+          activeServerId: activeServerId
+        }, "*");
+      } catch (e) {}
+    }
+
+    // Listen for login, logout, theme, and server sync messages from the GAS iframe
+    window.addEventListener("message", function(event) {
+      const data = event.data;
+      if (!data || data.source !== "CHORUS_GAS_APP") return;
+
+      if (data.type === "CHORUS_APP_LOADED" || data.type === "CHORUS_APP_READY") {
+        hideSplash();
+        if (data.type === "CHORUS_APP_LOADED") {
+          pushSessionToIframe();
+        }
+      }
+
+      if (data.type === "CHORUS_SESSION_SAVED") {
+        if (data.token) localStorage.setItem(STORAGE_KEYS.TOKEN, data.token);
+        if (data.user) localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+        if (data.activeServerId) localStorage.setItem(STORAGE_KEYS.SERVER_ID, data.activeServerId);
+      }
+
+      if (data.type === "CHORUS_SESSION_CLEARED") {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+      }
+
+      if (data.theme && ["dark", "light", "auto"].includes(data.theme)) {
+        localStorage.setItem(STORAGE_KEYS.THEME, data.theme);
+        applyPortalTheme(data.theme);
+      }
+
+      if (data.activeServerId) {
+        localStorage.setItem(STORAGE_KEYS.SERVER_ID, data.activeServerId);
+      }
+    });
+
+    // Initialize theme & load iframe
+    const initialTheme = localStorage.getItem(STORAGE_KEYS.THEME) || "dark";
+    applyPortalTheme(initialTheme);
+
+    const savedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+    if (savedToken) {
+      statusTextEl.textContent = "Restoring authenticated session...";
+    }
+
+    frameEl.src = buildTargetFrameUrl();
+
+    frameEl.addEventListener("load", function() {
+      pushSessionToIframe();
+      setTimeout(hideSplash, 350);
+    });
+
+    // Safety fallback in case onload takes longer
+    setTimeout(hideSplash, 6500);
+
+    // ─── Portal Connection Modal Controls ────────────────────────────────────
+    function openPortalConfig() {
+      document.getElementById("gas-url-input").value = getActiveGasUrl();
+      const tok = localStorage.getItem(STORAGE_KEYS.TOKEN);
+      let usr = null;
+      try { usr = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER) || "null"); } catch (e) {}
+      document.getElementById("session-indicator").textContent = tok
+        ? `Session: Active (${usr && usr.username ? usr.username : "Signed In"})`
+        : "Session: Not signed in";
+      document.getElementById("config-modal").classList.add("active");
+    }
+
+    function closePortalConfig() {
+      document.getElementById("config-modal").classList.remove("active");
+    }
+
+    function savePortalGasUrl() {
+      const val = document.getElementById("gas-url-input").value.trim();
+      if (!val || !val.startsWith("https://script.google.com/")) {
+        alert("Please enter a valid Google Apps Script Web App URL (starting with https://script.google.com/).");
+        return;
+      }
+      localStorage.setItem(STORAGE_KEYS.GAS_URL, val);
+      closePortalConfig();
+      splashHidden = false;
+      splashEl.classList.remove("hidden");
+      frameEl.classList.remove("loaded");
+      statusTextEl.textContent = "Reconnecting to updated deployment...";
+      frameEl.src = buildTargetFrameUrl();
+    }
+
+    function resetDefaultGasUrl() {
+      localStorage.removeItem(STORAGE_KEYS.GAS_URL);
+      document.getElementById("gas-url-input").value = DEFAULT_GAS_URL;
+    }
+
+    function clearPortalSavedSession() {
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      document.getElementById("session-indicator").textContent = "Session: Cleared";
+    }
+
+    // Keyboard shortcut Ctrl+Shift+U to open connection settings
+    window.addEventListener("keydown", function(e) {
+      if (e.ctrlKey && e.shiftKey && (e.key === "U" || e.key === "u")) {
+        e.preventDefault();
+        openPortalConfig();
+      }
+    });
+  </script>
+</body>
+</html>
