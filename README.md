@@ -10,7 +10,7 @@ This GitHub Pages repository hosts the lightweight, full-viewport web wrapper fo
 - **Full-Viewport Responsive Framing:** Adapts cleanly across desktop, tablet, and smartphone screens with safe-area support.
 - **Cross-Origin Bridge (`CHORUS_GH_PAGES` ↔ `CHORUS_GAS_APP`):** Syncs theme preferences, query parameters, and opt-in remembered sessions without blocking direct login.
 - **Strict Session Hygiene:** Clears parent storage immediately on logout or whenever **Keep me signed in** is unchecked.
-- **Graceful Boot Fallback:** Displays a lightweight loading card and direct fallback link if third-party iframe cookies are restricted by the browser.
+- **Smooth Boot Splash:** Displays a lightweight loading card while the console initializes.
 
 ## Deployment
 
