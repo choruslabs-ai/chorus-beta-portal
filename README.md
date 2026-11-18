@@ -3,35 +3,15 @@
 **Organization:** CHORUS Labs  
 **Architect & Creator:** `inf3rno`
 
-This GitHub Pages repository hosts the lightweight, full-viewport web wrapper for the **CHORUS β (`v7.8.4`) Google Apps Script Control Plane**, providing a clean URL, mobile-safe viewport framing (`100dvh` + `viewport-fit=cover`), and cross-origin `postMessage` theme and session synchronization.
+This GitHub Pages repository hosts the lightweight, full-viewport web wrapper for the **CHORUS β (`v7.8.4`) Control Console**, providing a clean public URL, mobile-safe viewport framing (`100dvh` + `viewport-fit=cover`), and cross-origin `postMessage` theme and session synchronization.
 
----
+## Features
 
-## Live Control Plane Endpoint
+- **Full-Viewport Responsive Framing:** Adapts cleanly across desktop, tablet, and smartphone screens with safe-area support.
+- **Cross-Origin Bridge (`CHORUS_GH_PAGES` ↔ `CHORUS_GAS_APP`):** Syncs theme preferences, query parameters, and opt-in remembered sessions without blocking direct login.
+- **Strict Session Hygiene:** Clears parent storage immediately on logout or whenever **Keep me signed in** is unchecked.
+- **Graceful Boot Fallback:** Displays a lightweight loading card and direct fallback link if third-party iframe cookies are restricted by the browser.
 
-- **Google Apps Script Web App (`v7.8.4`):**  
-  `https://script.google.com/macros/s/AKfycbzZhYio-ZgGYBYWqddBxq_TsLtjpax9xJJg8cFm9tvHBRu6i0zK6EQuxqSemD8NFl9A/exec`
+## Deployment
 
----
-
-## Architecture & Bridge Protocol
-
-`index.html` embeds the Google Apps Script Web App in a full-viewport `<iframe>` and communicates with `Scripts_TelemetryAndPortal.html` over the verified `CHORUS_GH_PAGES` ↔ `CHORUS_GAS_APP` `postMessage` bridge:
-
-| Direction | Message Type | Purpose |
-|-----------|--------------|---------|
-| GAS → Portal | `CHORUS_APP_LOADED` | Signals iframe DOM boot complete; dismisses splash screen and triggers theme/session check. |
-| Portal → GAS | `CHORUS_RESTORE_SESSION` | Forwards saved theme and (only if **Remember Me** is enabled inside the console) remembered session metadata. |
-| GAS → Portal | `CHORUS_APP_READY` | Confirms authenticated workspace or centered login portal is interactive. |
-| GAS → Portal | `CHORUS_SESSION_SAVED` | Syncs remembered session token/guild when **Keep me signed in (30 days)** is checked; clears parent storage when unchecked. |
-| GAS → Portal | `CHORUS_SESSION_CLEARED` | Purges parent `localStorage` immediately on logout or unremembered visit. |
-
----
-
-## Updating the Deployment URL
-
-When you create a new Google Apps Script Web App deployment, update `GAS_WEBAPP_URL` and the `<iframe src>` / fallback link in `index.html`, then push to `main` (GitHub Pages auto-publishes within ~1 minute).
-
-Pair this portal with:
-- **Apps Script Control Plane:** `apps_script_v7.8.4_Production_Verified.zip`
-- **Discord Bot Execution Plane (Railway):** `CHORUS-BOT_v7.8.4_Railway_Verified.zip`
+Update the configured Web App endpoint inside `index.html` whenever you publish a new control-plane deployment, then push to `main` to trigger GitHub Pages publishing.
